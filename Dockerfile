@@ -10,5 +10,5 @@ RUN pip install pipenv && pipenv install --system
 
 COPY . /Stockify/
 
-RUN adduser --disabled-login myuser
+RUN adduser --disabled-login myuseR
 USER myuser
