@@ -16,13 +16,26 @@ class UserManager(BaseUserManager):
         user.save()
 
         return user
-
+    def create_superuser(self, email, password=None):
+        """Creates and saves new Superuser"""
+        user = self.create_user(email, password)
+        user.is_staff = True
+        user.is_superuser = True
+        user.save()
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-
+    date_created = models.DateTimeField(auto_now_add=True)
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
+class Stock(models.Model):
+    name = models.CharField(max_length=5, unique=True)
+
+class Watchlist(models.Model):
+    name = models.CharField(max_length=255)
+    author = models.ForeignKey(Musician, on_delete=models.CASCADE)
+    stock =
