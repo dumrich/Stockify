@@ -1,12 +1,12 @@
-from django.urls import path
+from django.urls import path, include
 from rest_framework import routers
-from .views import StockCreate, WatchlistViewSet
+from .views import StockCreate, WatchlistUpdateRetriveDelete, WatchlistListCreate
 
-router = routers.SimpleRouter()
-
-router.register(r'watchlist', WatchlistViewSet, basename='watchlist')
 
 urlpatterns = [
     path('', StockCreate.as_view(), name='home'),
+    path('users/', include('users.urls')),
+    path('watchlist/', WatchlistListCreate.as_view(), name='list_create'),
+    path('watchlist/<int:pk>/', WatchlistUpdateRetriveDelete.as_view(), name='detail')
+
 ]
-urlpatterns += router.urls
