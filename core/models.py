@@ -43,7 +43,8 @@ class Stock(models.Model):
 class Watchlist(models.Model):
     name = models.CharField(max_length=255)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    stock = models.ManyToManyField(Stock)
+    stock = models.ManyToManyField(Stock, blank=False)
+
 
     def __str__(self):
         return self.name

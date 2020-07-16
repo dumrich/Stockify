@@ -3,6 +3,6 @@ from rest_framework import routers
 from .views import CreateUserView, CreateTokenView
 
 urlpatterns = [
-    path('', CreateUserView.as_view(), name='Create User'),
-    path('login/', CreateTokenView.as_view(), name='api_token_auth')
+    path('', CreateUserView.as_view(), name='create'),
+    path('login/', CreateTokenView.as_view(), name='login')
 ]

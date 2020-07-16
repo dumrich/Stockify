@@ -1,19 +1,28 @@
 from django.contrib.auth import get_user_model
+from django.test import TestCase
+from rest_framework.test import APIClient
+from rest_framework import status
+from django.urls import reverse
 
-from rest_framework import serializers
+CREATE_USER_URL = reverse('user:create')
+TOKEN_URL = reverse('user:login')
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = get_user_model()
-        fields = ('email', 'password', 'name')
-        extra_kwargs = {'password': {'write_only':True, 'min-length':5}}
+def sample_user(**kwargs):
+    return get_user_model().objects.create_user(**params)
 
-        def create(self, validated_data):
-            user = User(
-                email=validated_data['email']
-                name=validated_data['name']
+def PublicUserApiTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
 
-            )
-            user.set_password(validated_data['password'])
-            user.save()
-            return user
+    def test_create_valid_user(self):
+        payload = {
+            'email': 'test@test.com',
+            'password': 'testpass',
+            'name': 'Test name'
+        }
+        res = self.client.post(CREATE_USER_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        user = get_user_model().objects.get(**res.data)
+        self.assertTrue(user.check_password(payload['password']))
+        self.assertNotIn('password', res.data)
