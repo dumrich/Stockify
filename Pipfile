@@ -7,6 +7,10 @@ name = "pypi"
 django = "*"
 psycopg2-binary = "*"
 djangorestframework = "*"
+urllib3 = "*"
+requests = "*"
+beautifulsoup4 = "*"
+lxml = "*"
 
 [dev-packages]
 

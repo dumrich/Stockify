@@ -53,4 +53,6 @@ class Watchlist(models.Model):
         ordering = ['-name']
 
 
+class StockData(models.Model):
+    ticker = models.CharField(max_length = 5)
 
