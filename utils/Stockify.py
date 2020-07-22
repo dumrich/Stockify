@@ -17,7 +17,7 @@ class Stockify:
     def get_CIK(self):
         url = f"https://sec.report/Ticker/{self.ticker}"
         request = {'url': url, }
-        soup = BeautifulSoup(requests.get(request['url'], \
+        soup = BeautifulSoup(reqests.get(request['url'], \
                                           headers={'User-Agent':self.headers}).content, 'lxml')
 
         return(soup.h2.text.split()[-1])
@@ -27,13 +27,21 @@ class Stockify:
         soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')
 
         url_list = [a.get('href') for a in soup.find_all('a', id='interactiveDataBtn')][:10]
-        return {self.url_keys[i]: url_list[i] for i in range(len(self.url_keys))}
+        return {self.url_keys[i]: 'https://www.sec.gov'+url_list[i] for i in range(len(self.url_keys))}
 
     def get_EPS(self):
-        for url in self.url_dict.
-        return {self.url_keys[i]: }
+        for url in self.url_dict.values():
+            accession_number = url.split('&')[2][17:].replace('-', '')
+            BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK()[4:]}/{accession_number}/R2.htm"
+            request = {'url': BASE_URL, 'User-Agent': self.headers}
+            soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')
+
+            return 'EarningsPerShareBasic' in soup.prettify()
 
     def get_historical_stock_prices(self):
+
         pass
 
-print(Stockify('ko').get_EPS())
+print(Stockify('aapl').get_EPS())
+
+
