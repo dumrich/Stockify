@@ -12,10 +12,12 @@ class Stockify:
         self.base_url = f"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK={self.CIK}&type=10-K&dateb=&owner=include&count=40&search_text="
         self.url_keys = ['year 1','year 2','year 3','year 4','year 5','year 6','year 7','year 8',\
                    'year 9','year 10',]
-        self.url_dict = self.get_10K_links()
-        self.EPSList = self.get_EPS()
-       # self.OperationStatement = self.get_operation_statement_numbers()
-        
+    #    self.url_dict = self.get_10K_links()
+        self.OperatingDict = {'Ticker': self.ticker, 'DilutedEPS': [], 'BasicEPS':[], 'TotalNetSales':[], 'TotalCostOfSales':[], 'TotalMargin':[], \
+                'R&D':[], 'SG&A':[], 'TotalOperatingExpenses':[], 'OperatingIncome':[], 'IncomeBeforeTaxes': [], 'IncomeAfterTaxes':[]}
+        self.BalanceDict = {}
+        self.CashFlowDict = {}
+
     def get_CIK(self):
         """Get the SEC CIK"""
         url = f"https://sec.report/Ticker/{self.ticker}"
@@ -23,94 +25,118 @@ class Stockify:
         soup = BeautifulSoup(requests.get(request['url'], \
                                           headers={'User-Agent':self.headers}).content, 'lxml')
 
-        return(soup.h2.text.split()[-1])
+        return (soup.h2.text.split()[-1])
 
     def get_10K_links(self):
         """Get all 10K links"""
         request = {'url': self.base_url, 'User-Agent': self.headers}
         soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')
 
-        url_list = [a.get('href') for a in soup.find_all('a', id='interactiveDataBtn')][:10]
+        url_list = [a.get('href') for a in soup.find_all('a', id='interactiveDataBtn')][:11]
         return {self.url_keys[i]: 'https://www.sec.gov'+url_list[i] for i in range(len(self.url_keys))}
 
-    def get_EPS(self):
+    def get_operating_statement(self):
         """Get the EPS"""
-        EPSList = []
+        OperatingDict = {'Ticker':self.ticker}
 
-        for url in list(self.url_dict.values())[:9]:
+        for i, url in enumerate(list(self.get_10K_links().values())[0:9:3]):
             accession_number = url.split('&')[2][17:].replace('-', '')
             try:
                 BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R2.htm"
                 request = {'url': BASE_URL, 'User-Agent': self.headers}
-                soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')\
-                        .prettify().split('defref_us-gaap_EarningsPerShareBasic')[1].split("\n")[5].strip()
-                EPSList.append(soup.strip(' '))
-            except:
-                BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R3.htm"
-                request = {'url': BASE_URL, 'User-Agent': self.headers}
-                soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')\
-                       .prettify().split('defref_us-gaap_EarningsPerShareBasic')[1].split("\n")[5].strip()
+                soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')
+                
+                if '12 months ended' not in soup.prettify().lower():
+                    raise IndexError('Incorrect URL. Trying R3 Form')
 
-                EPSList.append(soup.strip(' '))
+                all_data = []
+                for tr in soup.select('tr'):
+                    tds = [td for td in tr.select('td') if td.get_text(strip=True)]
+                    if len(tds) == 4:
+                        tds[0] = re.search(r"'(.*?)'", tds[0].a['onclick']).group(1)
+                        tds[1:] = [td.get_text(strip=True) for td in tds[1:]]
+                        all_data.append(tds)
 
-
-        return [item for item in EPSList if item[0] == '$']
-
-    def get_operation_statement_numbers(self):
-        NetSalesID = 'Revenue'
-        CostOfSalesID = 'us-gaap_CostOfGoodsAndServicesSold'
-        NetMarginID = 'us-gaap_GrossProfit'
-        NetIncomeID = 'us-gaap_NetIncomeLoss'
-        ResearchDevelopmentID = 'us-gaap_ResearchAndDevelopmentExpense'
-        SGAID = 'us-gaap_SellingGeneralAndAdministrativeExpense'
-        OperatingExpensesID = "us-gaap_OperatingExpenses'"
-        OperatingIncomeID = 'us-gaap_OperatingIncomeLoss'
-        OtherIncomeID = 'us-gaap_NonoperatingIncomeExpense'
-        IncomeBeforeProvisionIncomeTaxesID = 'us-gaap_IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest'
-        ProvisionForIncomeTaxesID = 'us-gaap_IncomeTaxExpenseBenefit'
-        NetIncomeID = 'us-gaap_NetIncomeLoss'
-        DilutedEPSID = 'us-gaap_EarningsPerShareDiluted'
-
-        tag = [NetSalesID, CostOfSalesID, NetMarginID, NetIncomeID, ResearchDevelopmentID, SGAID,\
-                OperatingExpensesID, OperatingIncomeID, IncomeBeforeProvisionIncomeTaxesID, ProvisionForIncomeTaxesID, NetIncomeID,DilutedEPSID]
-
-        OperatingDict = {'StockName': self.ticker, 'EPS':self.EPSList, NetSalesID:[], CostOfSalesID:[], NetMarginID: [], NetIncomeID:[], ResearchDevelopmentID:[],\
-                SGAID: [], OperatingExpensesID:[], OperatingIncomeID: [], IncomeBeforeProvisionIncomeTaxesID:[], ProvisionForIncomeTaxesID:[], NetIncomeID:[], DilutedEPSID:[], \
-                }
-        for url in list(self.url_dict.values())[:9]:
-            accession_number = url.split('&')[2][17:].replace('-', '')
+                for row in all_data:
+                    print('{:<90} {:<10} {:<10} {:<10}'.format(*row))
+                    if i==0:
+                        OperatingDict[row[0]] = row[1:]
+                    try:
+                        OperatingDict[row[0]].extend(row[1:])
+                    except KeyError:
+                        OperatingDict[row[0]] = row[1:]
             
-            try:
-                BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R2.htm"
-                request = {'url': BASE_URL, 'User-Agent': self.headers}
-                soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')\
-                        .prettify()
+            except IndexError:
+                try:
+                    BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R3.htm"
+                    request = {'url': BASE_URL, 'User-Agent': self.headers}
+                    soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')
+                    
+                    if '12 months ended' not in soup.prettify().lower():
+                        raise ValueError('Incorrect URL. Trying R4 Form')
+
+
+                    all_data = []
+                    for tr in soup.select('tr'):
+                        tds = [td for td in tr.select('td') if td.get_text(strip=True)]
+                        if len(tds) == 4:
+                            tds[0] = re.search(r"'(.*?)'", tds[0].a['onclick']).group(1)
+                            tds[1:] = [td.get_text(strip=True) for td in tds[1:]]
+                            all_data.append(tds)
+
+                    for row in all_data:
+                        print('{:<90} {:<10} {:<10} {:<10}'.format(*row))
+                        if i==0:
+                            OperatingDict[row[0]] = row[1:]
+                        try:
+                            OperatingDict[row[0]].extend(row[1:])
+                        except KeyError:
+                            OperatingDict[row[0]] = row[1:]                
+
+                except ValueError:
+                    BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R4.htm"
+                    request = {'url': BASE_URL, 'User-Agent': self.headers}
+                    soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')
+                    if '12 months ended' not in soup.prettify().lower():
+                        raise NameError('Incorrect URL. File Not Found')
+
+                    all_data = []
+                    for tr in soup.select('tr'):
+                        tds = [td for td in tr.select('td') if td.get_text(strip=True)]
+                        if len(tds) == 4:
+                            tds[0] = re.search(r"'(.*?)'", tds[0].a['onclick']).group(1)
+                            tds[1:] = [td.get_text(strip=True) for td in tds[1:]]
+                            all_data.append(tds)
+
+                    for row in all_data:
+                        print('{:<90} {:<10} {:<10} {:<10}'.format(*row))
+                        if i==0:
+                            OperatingDict[row[0]] = row[1:]
+                        try:
+                            OperatingDict[row[0]].extend(row[1:])
+                        except KeyError:
+                            OperatingDict[row[0]] = row[1:] 
+
+
+            
+
+           
 
 
 
-                for i in tag:
-                   
-                    OperatingDict[i].append(soup.split(i)[1].split("\n")[5].strip())
-            except:
-                BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R3.htm"
-                request = {'url': BASE_URL, 'User-Agent': self.headers}
-                soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')\
-                        .prettify()
-
-
-
-                for i in tag:
-                    OperatingDict[i].append(soup.split(i)[1].split("\n")[5].strip())
-
-        return OperatingDict 
+        return OperatingDict
         
 
 
 
 
-    def get_historical_stock_prices(self):
+    def get_daily_quote(self):
         pass
 
 
-print(Stockify('msft').get_10K_links())
+print(Stockify('googl').get_CIK())
+
+
+
+
 
