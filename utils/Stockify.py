@@ -149,7 +149,7 @@ class Stockify:
         """Get operating statement numbers from SEC"""
         BalanceDict = {'Ticker':self.ticker}
 
-        for i, url in enumerate(list(self.get_10K_links().values())[0:-1:3]):
+        for i, url in enumerate(list(self.get_10K_links().values())[0:-1:2]):
             accession_number = url.split('&')[2][17:].replace('-', '')
             try:
                 BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R4.htm"
@@ -158,6 +158,120 @@ class Stockify:
                 
                 if 'balance sheets' not in soup.prettify().lower():
                     raise IndexError('Incorrect URL. Trying R1 Form')
+
+
+
+                all_data = []
+                for tr in soup.select('tr'):
+                    tds = [td for td in tr.select('td') if td.get_text(strip=True)]
+
+                    if len(tds) == 3:
+                        tds[0] = re.search(r"'(.*?)'", tds[0].a['onclick']).group(1)
+                        tds[1:] = [td.get_text(strip=True) for td in tds[1:]]
+                        all_data.append(tds)
+
+                for row in all_data:
+                    print('{:<90} {:<10} {:<10}'.format(*row))
+                    if i==0:
+                        BalanceDict[row[0]] = row[1:]
+                    try:
+                        BalanceDict[row[0]].extend(row[1:])
+                    except KeyError:
+                        BalanceDict[row[0]] = row[1:]
+            
+            except IndexError:
+                try:
+                    BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R5.htm"
+                    request = {'url': BASE_URL, 'User-Agent': self.headers}
+                    soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')
+                    
+                    if 'balance sheet' not in soup.prettify().lower():
+                        raise IndexError('Incorrect URL. Trying R6 Form')
+
+
+                    all_data = []
+                    for tr in soup.select('tr'):
+                        tds = [td for td in tr.select('td') if td.get_text(strip=True)]
+                        if len(tds) == 3:
+                            tds[0] = re.search(r"'(.*?)'", tds[0].a['onclick']).group(1)
+                            tds[1:] = [td.get_text(strip=True) for td in tds[1:]]
+                            all_data.append(tds)
+
+                    for row in all_data:
+                        print('{:<90} {:<10} {:<10}'.format(*row))
+                        if i==0:
+                            BalanceDict[row[0]] = row[1:]
+                        try:
+                            BalanceDict[row[0]].extend(row[1:])
+                        except KeyError:
+                            BalanceDict[row[0]] = row[1:]                
+
+                except IndexError:
+                    try:
+                        BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R1.htm"
+                        request = {'url': BASE_URL, 'User-Agent': self.headers}
+                        soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')
+                        if 'balance sheet' not in soup.prettify().lower():
+                            raise IndexError('Incorrect URL. Trying R5 form')
+
+                        all_data = []
+                        for tr in soup.select('tr'):
+                            tds = [td for td in tr.select('td') if td.get_text(strip=True)]
+                            if len(tds) == 3:
+                                tds[0] = re.search(r"'(.*?)'", tds[0].a['onclick']).group(1)
+                                tds[1:] = [td.get_text(strip=True) for td in tds[1:]]
+                                all_data.append(tds)
+
+                        for row in all_data:
+                            print('{:<90} {:<10} {:<10}'.format(*row))
+                            if i==0:
+                                BalanceDict[row[0]] = row[1:]
+                            try:
+                                BalanceDict[row[0]].extend(row[1:])
+                            except KeyError:
+                                BalanceDict[row[0]] = row[1:] 
+
+                    except IndexError:
+                        BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R6.htm"
+                        request = {'url': BASE_URL, 'User-Agent': self.headers}
+                        soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')
+                        if 'balance sheet' not in soup.prettify().lower():
+                            raise NameError('Incorrect URL. File Not Found')
+
+                        all_data = []
+                        for tr in soup.select('tr'):
+                            tds = [td for td in tr.select('td') if td.get_text(strip=True)]
+                            if len(tds) == 3:
+                                tds[0] = re.search(r"'(.*?)'", tds[0].a['onclick']).group(1)
+                                tds[1:] = [td.get_text(strip=True) for td in tds[1:]]
+                                all_data.append(tds)
+
+                        for row in all_data:
+                            print('{:<90} {:<10} {:<10}'.format(*row))
+                            if i==0:
+                                BalanceDict[row[0]] = row[1:]
+                            try:
+                                BalanceDict[row[0]].extend(row[1:])
+                            except KeyError:
+                                BalanceDict[row[0]] = row[1:] 
+
+
+        return BalanceDict
+    
+
+    def get_cash_flow_numbers(self):
+        """Get operating statement numbers from SEC"""
+        OperatingDict = {'Ticker':self.ticker}
+
+        for i, url in enumerate(list(self.get_10K_links().values())[0:-1:3]):
+            accession_number = url.split('&')[2][17:].replace('-', '')
+            try:
+                BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R6.htm"
+                request = {'url': BASE_URL, 'User-Agent': self.headers}
+                soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')
+                
+                if '12 months ended' not in soup.prettify().lower():
+                    raise IndexError('Incorrect URL. Trying R3 Form')
 
                 all_data = []
                 for tr in soup.select('tr'):
@@ -170,20 +284,20 @@ class Stockify:
                 for row in all_data:
                     print('{:<90} {:<10} {:<10} {:<10}'.format(*row))
                     if i==0:
-                        BalanceDict[row[0]] = row[1:]
+                        OperatingDict[row[0]] = row[1:]
                     try:
-                        BalanceDict[row[0]].extend(row[1:])
+                        OperatingDict[row[0]].extend(row[1:])
                     except KeyError:
-                        BalanceDict[row[0]] = row[1:]
+                        OperatingDict[row[0]] = row[1:]
             
             except IndexError:
                 try:
-                    BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R1.htm"
+                    BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R7.htm"
                     request = {'url': BASE_URL, 'User-Agent': self.headers}
                     soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')
                     
-                    if 'balance sheet' not in soup.prettify().lower():
-                        raise ValueError('Incorrect URL. Trying R6 Form')
+                    if '12 months ended' not in soup.prettify().lower():
+                        raise IndexError('Incorrect URL. Trying R4 Form')
 
 
                     all_data = []
@@ -197,19 +311,19 @@ class Stockify:
                     for row in all_data:
                         print('{:<90} {:<10} {:<10} {:<10}'.format(*row))
                         if i==0:
-                            BalanceDict[row[0]] = row[1:]
+                            OperatingDict[row[0]] = row[1:]
                         try:
-                            BalanceDict[row[0]].extend(row[1:])
+                            OperatingDict[row[0]].extend(row[1:])
                         except KeyError:
-                            BalanceDict[row[0]] = row[1:]                
+                            OperatingDict[row[0]] = row[1:]                
 
                 except IndexError:
                     try:
-                        BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R6.htm"
+                        BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R4.htm"
                         request = {'url': BASE_URL, 'User-Agent': self.headers}
                         soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')
-                        if 'balance sheet' not in soup.prettify().lower():
-                            raise NameError('Incorrect URL. Trying R5 form')
+                        if '12 months ended' not in soup.prettify().lower():
+                            raise IndexError('Incorrect URL. Trying R5 form')
 
                         all_data = []
                         for tr in soup.select('tr'):
@@ -222,17 +336,17 @@ class Stockify:
                         for row in all_data:
                             print('{:<90} {:<10} {:<10} {:<10}'.format(*row))
                             if i==0:
-                                BalanceDict[row[0]] = row[1:]
+                                OperatingDict[row[0]] = row[1:]
                             try:
-                                BalanceDict[row[0]].extend(row[1:])
+                                OperatingDict[row[0]].extend(row[1:])
                             except KeyError:
-                                BalanceDict[row[0]] = row[1:] 
+                                OperatingDict[row[0]] = row[1:] 
 
                     except IndexError:
-                        BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R5.htm"
+                        BASE_URL = f"https://www.sec.gov/Archives/edgar/data/{self.get_CIK().strip('0')}/{accession_number}/R6.htm"
                         request = {'url': BASE_URL, 'User-Agent': self.headers}
                         soup = BeautifulSoup(requests.get(request['url'], headers={'User-Agent': request['User-Agent']}).content, 'lxml')
-                        if 'balance sheet' not in soup.prettify().lower():
+                        if '12 months ended' not in soup.prettify().lower():
                             raise NameError('Incorrect URL. File Not Found')
 
                         all_data = []
@@ -246,23 +360,21 @@ class Stockify:
                         for row in all_data:
                             print('{:<90} {:<10} {:<10} {:<10}'.format(*row))
                             if i==0:
-                                BalanceDict[row[0]] = row[1:]
+                                OperatingDict[row[0]] = row[1:]
                             try:
-                                BalanceDict[row[0]].extend(row[1:])
+                                OperatingDict[row[0]].extend(row[1:])
                             except KeyError:
-                                BalanceDict[row[0]] = row[1:] 
+                                OperatingDict[row[0]] = row[1:] 
 
 
-        return BalanceDict
-    
-
+        return OperatingDict
 
 
     def get_daily_quote(self):
         pass
 
 
-print(Stockify('aapl').get_balance_sheet_numbers())
+print(Stockify('aapl').get_cash_flow_numbers())
 
 
 
