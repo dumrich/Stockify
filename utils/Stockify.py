@@ -65,11 +65,17 @@ class Stockify:
                             OperatingDict[row[0]] = row[1:]
                         elif (row[0] == 'defref_us-gaap_RevenueFromContractWithCustomerExcludingAssessedTax' and len(OperatingDict['defref_us-gaap_SalesRevenueNet'])!=0):
                             OperatingDict[row[0]] = row[1:]
+                        
+
                         else:
                             OperatingDict[row[0]] = row[1:]
                     else:
                         try:
-                            OperatingDict[row[0]].extend(row[1:])
+
+                            if (row[0]=='defref_us-gaap_Revenues' and len(OperatingDict['defref_us-gaap_SalesRevenueNet'])!=0):
+                                OperatingDict['defref_us-gaap_SalesRevenueNet'].extend(row[1:])
+                            else:
+                                OperatingDict[row[0]].extend(row[1:])
                         except KeyError:
                             OperatingDict[row[0]] = row[1:]                 
             except IndexError:
@@ -101,7 +107,11 @@ class Stockify:
                                 OperatingDict[row[0]] = row[1:]
                         else:
                             try:
-                                OperatingDict[row[0]].extend(row[1:])
+
+                                if (row[0]=='defref_us-gaap_Revenues' and len(OperatingDict['defref_us-gaap_SalesRevenueNet'])!=0):
+                                    OperatingDict['defref_us-gaap_SalesRevenueNet'].extend(row[1:])
+                                else:
+                                    OperatingDict[row[0]].extend(row[1:])
                             except KeyError:
                                 OperatingDict[row[0]] = row[1:]             
 
@@ -133,7 +143,11 @@ class Stockify:
                                     OperatingDict[row[0]] = row[1:]
                             else:
                                 try:
-                                    OperatingDict[row[0]].extend(row[1:])
+
+                                    if (row[0]=='defref_us-gaap_Revenues' and len(OperatingDict['defref_us-gaap_SalesRevenueNet'])!=0):
+                                        OperatingDict['defref_us-gaap_SalesRevenueNet'].extend(row[1:])
+                                    else:
+                                        OperatingDict[row[0]].extend(row[1:])
                                 except KeyError:
                                     OperatingDict[row[0]] = row[1:]     
 
@@ -162,7 +176,11 @@ class Stockify:
                                     OperatingDict[row[0]] = row[1:]
                             else:
                                 try:
-                                    OperatingDict[row[0]].extend(row[1:])
+
+                                    if (row[0]=='defref_us-gaap_Revenues' and len(OperatingDict['defref_us-gaap_SalesRevenueNet'])!=0):
+                                        OperatingDict['defref_us-gaap_SalesRevenueNet'].extend(row[1:])
+                                    else:
+                                        OperatingDict[row[0]].extend(row[1:])
                                 except KeyError:
                                     OperatingDict[row[0]] = row[1:] 
 
@@ -429,7 +447,7 @@ class Stockify:
         pass
 
 
-print(Stockify('amzn').get_operating_statement())
+print(Stockify('fb').get_operating_statement())
 
 
 
