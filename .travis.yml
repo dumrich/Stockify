@@ -10,3 +10,4 @@ before_script: pip install docker-compose
 script:
   - docker-compose up -d
   - docker-compose exec web python manage.py test
+  - python3.8 -m unittest utils/test_financials.py
