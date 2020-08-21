@@ -65,13 +65,12 @@ class Stockify:
                         all_data.append(tds)
                 
                 for row in all_data:
+                    row[1:].replace('(', '').replace(')', '').replace('$', '').strip()
                     if i==0:
                         if (row[0] == 'defref_us-gaap_RevenueFromContractWithCustomerExcludingAssessedTax' and 'defref_us-gaap_SalesRevenueNet' not in OperatingDict):
                             OperatingDict['defref_us-gaap_SalesRevenueNet'] = row[1:]
                         elif (row[0] == 'defref_us-gaap_RevenueFromContractWithCustomerExcludingAssessedTax' and len(OperatingDict['defref_us-gaap_SalesRevenueNet'])!=0):
                             OperatingDict[row[0]] = row[1:]
-                        
-
                         else:
                             OperatingDict[row[0]] = row[1:]
                     else:
@@ -102,6 +101,9 @@ class Stockify:
                 if 'cashandcash' not in soup.prettify().lower():
                     continue
 
+                if x == 8 and 'cash flows' not in soup.prettify().lower():
+                   raise IndexError('File not found.  Check if ticker is correct, and try again later.')
+
                 all_data = []
                 for tr in soup.select('tr'):
                     tds = [td for td in tr.select('td') if td.get_text(strip=True)]
@@ -120,7 +122,7 @@ class Stockify:
                         except KeyError:
                             BalanceDict[row[0]] = row[1:]             
 
-            break
+                break
 
         return BalanceDict    
 
@@ -138,6 +140,9 @@ class Stockify:
                 if '12 months ended' and 'cash flows' not in soup.prettify().lower():
                     continue
 
+                if x == 8 and 'cash flows' not in soup.prettify().lower():
+                   raise IndexError('File not found.  Check if ticker is correct, and try again later.')
+
                 all_data = []
                 for tr in soup.select('tr'):
                     tds = [td for td in tr.select('td') if td.get_text(strip=True)]
@@ -153,7 +158,7 @@ class Stockify:
                         CashFlowDict[row[0]].extend(row[1:])
                     except KeyError:
                         CashFlowDict[row[0]] = row[1:]
-            break
+                break
             
         return CashFlowDict
             
@@ -185,4 +190,4 @@ class Stockify:
     def get_historical_stock_values(self):
         pass
 
-print(Stockify('aapl').get_operating_statement())
+print(Stockify('aapl').get_cash_flow())
