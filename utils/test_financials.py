@@ -4,6 +4,7 @@ import unittest
 
 class TestFinancials(unittest.TestCase):
     """Test getting financial data works"""
+
     def setUp(self):
         self.Stock = Stockify("aApL")
 
@@ -16,7 +17,7 @@ class TestFinancials(unittest.TestCase):
         """Test getting the balance sheet is successful"""
         Financials = self.Stock.get_balance_sheet()
         self.assertIn(Financials, 'defref_us-gaap_NetIncomeLoss')
-
+    
 
 if __name__ == '__main__':
     unittest.main()
