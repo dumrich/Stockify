@@ -6,7 +6,7 @@
 
 Stockify is a web api and (soon to be!) Python library that gets 10 year financial data from the www.sec.gov, and analyzes a list of stocks to invest in.  Python library coming soon.
 
-## How to install
+## How to Install
 You need docker and docker-compose in order to build and install this app.
 
 1. First clone the repository
@@ -20,4 +20,4 @@ Now, go to localhost:8000/Stockify/{put ticker here} to get an analysis and the 
 
 And done!
 
-Documentation coming soon
+[#Documentation coming soon!#]
