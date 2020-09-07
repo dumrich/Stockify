@@ -26,15 +26,15 @@ And done!
 
 #### Python Web Dev: Proj 1
 Must Use:
-- [x] OOP with property decorators, modules, class and static methods, dunder methods
-- [] Some Data Structures
-- [x] Comprehensions
-- [] Lambda functions
-- [] Collections
-- [x] args and kwargs
-- [] Inheritence
-- [x] Modules
-- [] Non-OOP Decorators
-- [] Generators
-- [] Package
-- [x] metaclasses 
+[x] OOP with property decorators, modules, class and static methods, dunder methods
+[] Some Data Structures
+[x] Comprehensions
+[] Lambda functions
+[] Collections
+[x] args and kwargs
+[] Inheritence
+[x] Modules
+[] Non-OOP Decorators
+[] Generators
+[] Package
+[x] metaclasses 
