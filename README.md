@@ -26,6 +26,7 @@ And done!
 
 #### Python Web Dev: Proj 1
 Must Use:
+
 -[x] OOP with property decorators, modules, class and static methods, dunder methods
 -[] Some Data Structures
 -[x] Comprehensions
