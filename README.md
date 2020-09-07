@@ -20,7 +20,7 @@ Now, go to localhost:8000/Stockify/{put ticker here} to get an analysis and the 
 
 And done!
 
-[# Documentation coming soon! #]
+# Documentation coming soon!
 
 
 
