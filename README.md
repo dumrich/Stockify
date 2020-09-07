@@ -28,14 +28,14 @@ And done!
 Must Use:
 
 - [x] OOP with property decorators, modules, class and static methods, dunder methods
-- [] Some Data Structures
+- [ ] Some Data Structures
 - [x] Comprehensions
-- [] Lambda functions
-- [] Collections
+- [ ] Lambda functions
+- [ ] Collections
 - [x] args and kwargs
-- [] Inheritence
+- [ ] Inheritence
 - [x] Modules
-- [] Non-OOP Decorators
-- [] Generators
-- [] Package
+- [ ] Non-OOP Decorators
+- [ ] Generators
+- [ ] Package
 - [x] metaclasses
