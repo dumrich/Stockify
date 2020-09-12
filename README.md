@@ -39,3 +39,10 @@ Must Use:
 - [ ] Generators
 - [ ] Package
 - [x] metaclasses
+
+#### To Do:
+- [ ] Update the main Stockify algorithm to a custom and better one
+- [ ] Add more of the advanced python concepts to project
+- [ ] Upload the data package to PyPi
+- [ ] Connect the algorithm to the DRF API
+- [ ] Make web scraping faster/store statements inside PostgresDB
