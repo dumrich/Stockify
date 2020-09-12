@@ -41,6 +41,7 @@ Must Use:
 - [x] metaclasses
 
 #### To Do:
+- [ ] Add scanner for all stocks
 - [ ] Update the main Stockify algorithm to a custom and better one
 - [ ] Add more of the advanced python concepts to project
 - [ ] Upload the data package to PyPi
