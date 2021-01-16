@@ -1,7 +1,7 @@
 # Stockify Web API
 [![Build Status](https://travis-ci.com/dumrich/Stockify.svg?token=zTi4VzdoZNq1JFVnvzyd&branch=master)](https://travis-ci.com/dumrich/Stockify)
 
-## **IMPORTANT**: Development on hold until 10/1/20
+## **IMPORTANT**: Development on hold until 2/1/21
 
 
 Stockify is a web api and (soon to be!) Python library that gets 10 year financial data from the www.sec.gov, and analyzes a list of stocks to invest in.  Python library coming soon.
