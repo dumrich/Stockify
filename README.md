@@ -16,7 +16,7 @@ You need docker and docker-compose in order to build and install this app.
 
 3. Finally, after switching to that directory, run `docker-compose up -d && docker-compose exec web python /Stockify/manage.py runserver 0.0.0.0:8000`
 
-Now, go to localhost:8000/Stockify/{put ticker here} to get an analysis and the financial statements.  To scan your list of stocks or our best picks, go to localhost:8000/scanner/stocks?={leave blank if you want to use our master list, put in a list of stocks seperated by commas otherwise}
+Now, go to `localhost:8000/Stockify/{put ticker here}` to get an analysis and the financial statements.  To scan your list of stocks or our best picks, go to localhost:8000/scanner/stocks?={leave blank if you want to use our master list, put in a list of stocks seperated by commas otherwise}
 
 And done!
 
