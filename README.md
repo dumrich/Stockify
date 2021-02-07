@@ -32,13 +32,29 @@ Must Use:
 - [x] Comprehensions
 - [ ] Lambda functions
 - [ ] Collections
-- [x] args and kwargs
+- [] args and kwargs required
 - [ ] Inheritence
 - [x] Modules
-- [ ] Non-OOP Decorators
-- [ ] Generators
+- [ ] closures/Non-OOP Decorators with `functools.wraps`
+- [ ] Generators/Generator expressions
 - [ ] Package
-- [x] metaclasses
+- [ ] metaclasses
+- [ ] F-strings
+- [x] Enumerate
+- [ ] Zip
+- [ ] Assignment Expressions
+- [ ] Catch-all unpacking
+- [ ] key sorting
+- [ ] get/setdefault/defaultdict
+- [ ] Itertools
+- [ ] Class Hierarchies
+- [ ] Classmethods
+- [ ] super
+- [ ] mixins
+- [ ] property decorator/descriptor
+- [ ] getattr, getattribute, setattr
+
+
 
 #### To Do:
 - [ ] Add scanner for all stocks
